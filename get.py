@@ -83,7 +83,7 @@ def print_kills(query):
 if __name__ == "__main__":
     commands = {
         "kdr": (
-            "Fetch top players and their KDR",
+            "Fetch top fighters according to KDR",
             "kdr_request.json",
             print_kdr,
         ),
