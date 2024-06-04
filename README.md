@@ -26,12 +26,14 @@ Now you can use the tool.
 Run `get.py` without arguments to detail usage. Example output:
 
 ```
-$ python get.py
-Usage: python get.py <command>
+Usage: python get.py <command> [options]
 Where command is one of:
-       kdr - Fetch top fighters according to KDR
-   victims - Fetch top victims
-     kills - Fetch top killers
+  kdr           - Fetch top fighters according to KDR
+  victims       - Fetch top victims
+  kills         - Fetch top killers
+And options are any of:
+  --raw         - Print raw JSON response from server
+  --noheaders   - Print table output without headers
 ```
 
 Example usage:
