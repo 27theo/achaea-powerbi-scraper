@@ -26,19 +26,18 @@ HEADERS = {
 }
 
 def get_query_result(data):
-    """Extract the query result from the data.
-
-    Bit of a hack, clearly. `item` will point to a dictionary with the desired
-    value under the first key, but that key name is different e.g. for KDR vs
-    Kills.
-    """
+    """Extract the query result from the data."""
+    # Bit of a hack, clearly. `item` will point to a dictionary with the
+    # desired value under the first key, but that key name is different e.g.
+    # for KDR vs Kills.
     item = data["results"][0]["result"]["data"]["dsr"]["DS"][0]["PH"][0]
     return next(iter(item.values()))
 
 def print_kdr(query):
     """Pretty print KDR data."""
-    print("       %-14s%8s%8s%8s" % ("Character", "KDR", "Kills", "Deaths"))
-    print("       %-14s%8s%8s%8s" % ("---------", "---", "-----", "------"))
+    if "--noheaders" not in argv:
+        print("       %-14s%8s%8s%8s" % ("Character", "KDR", "Kills", "Deaths"))
+        print("       %-14s%8s%8s%8s" % ("---------", "---", "-----", "------"))
     for entry in query:
         try:
             [char, kdr, kills, deaths, rank] = entry["C"]
@@ -51,8 +50,9 @@ def print_kdr(query):
 def print_victims(query):
     """Pretty print victim data."""
     last = (0, 0)
-    print("       %-14s%8s" % ("Character", "Deaths"))
-    print("       %-14s%8s" % ("---------", "------"))
+    if "--noheaders" not in argv:
+        print("       %-14s%8s" % ("Character", "Deaths"))
+        print("       %-14s%8s" % ("---------", "------"))
     for entry in query:
         if "R" in entry:
             # This signifies that the character has the same number of deaths as
@@ -67,8 +67,9 @@ def print_victims(query):
 def print_kills(query):
     """Pretty print kill data."""
     last = (0, 0)
-    print("       %-14s%8s" % ("Character", "Kills"))
-    print("       %-14s%8s" % ("---------", "-----"))
+    if "--noheaders" not in argv:
+        print("       %-14s%8s" % ("Character", "Kills"))
+        print("       %-14s%8s" % ("---------", "-----"))
     for entry in query:
         if "R" in entry:
             # This signifies that the character has the same number of deaths as
@@ -99,13 +100,24 @@ if __name__ == "__main__":
         ),
     }
 
+    options = {
+        "--raw": "Print raw JSON response from server",
+        "--noheaders": "Print table output without headers",
+    }
+
     if len(argv) < 2 or argv[1] not in commands:
-        print("Usage: python get.py <command>")
+        print("Usage: python get.py <command> [options]")
         print("Where command is one of:")
         for cmd, help in commands.items():
-            print("  %8s - %s" % (cmd, help[0]))
+            print("  %-13s - %s" % (cmd, help[0]))
+        print("And options are any of:")
+        for flag, desc in options.items():
+            print("  %-13s - %s" % (flag, desc))
         exit(1)
     else:
+        for arg in argv[2:]:
+            if arg not in list(options.keys()):
+                print("Unrecognised option:", arg)
         _, request_data_file, pretty_printer = commands[argv[1]]
 
     filename = join("data", request_data_file)
